@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Work of Art Gallery{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-palette mr-2"></i>Work of Art
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{{ url_for('index') }}" class="nav-link {{ 'active' if request.endpoint == 'index' }}">
+                            <i class="fas fa-home mr-1"></i>Home
+                        </a>
+                        <a href="{{ url_for('gallery') }}" class="nav-link {{ 'active' if request.endpoint == 'gallery' }}">
+                            <i class="fas fa-images mr-1"></i>Gallery
+                        </a>
+                        <a href="{{ url_for('artists') }}" class="nav-link {{ 'active' if request.endpoint == 'artists' }}">
+                            <i class="fas fa-user-tie mr-1"></i>Artists
+                        </a>
+                        <a href="{{ url_for('events') }}" class="nav-link {{ 'active' if request.endpoint == 'events' }}">
+                            <i class="fas fa-calendar mr-1"></i>Events
+                        </a>
+                        <a href="{{ url_for('about') }}" class="nav-link {{ 'active' if request.endpoint == 'about' }}">
+                            <i class="fas fa-info-circle mr-1"></i>About
+                        </a>
+
+                        {# --- START CONDITIONAL USER LINKS (DESKTOP) --- #}
+                        {% if session.user_id %}
+                            {% if session.role == 'admin' %}
+                                <a href="{{ url_for('admin_dashboard') }}" class="nav-link text-red-600 hover:text-red-800">
+                                    <i class="fas fa-cog mr-1"></i>Admin
+                                </a>
+                            {% elif session.role == 'artist' %}
+                                {% if session.artist_id %}
+                                    <a href="{{ url_for('artist_detail', artist_id=session.artist_id) }}" class="nav-link hover:text-green-600">
+                                        <i class="fas fa-paint-brush mr-1"></i>My Profile
+                                    </a>
+                                    <a href="{{ url_for('submit_artwork') }}" class="nav-link hover:text-blue-600">
+                                        <i class="fas fa-upload mr-1"></i>Submit Art
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('create_artist_profile') }}" class="nav-link text-orange-600 hover:text-orange-800">
+                                        <i class="fas fa-id-card mr-1"></i>Create Profile
+                                    </a>
+                                {% endif %} {# End if session.artist_id #}
+                            {% endif %} {# End if session.role == 'admin' / elif session.role == 'artist' #}
+                            <div class="relative inline-block text-left">
+                                <button type="button" class="nav-link" id="user-menu" onclick="toggleUserMenu()">
+                                    <i class="fas fa-user mr-1"></i>{{ session.username }}
+                                    <i class="fas fa-chevron-down ml-1"></i>
+                                </button>
+                                <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
+                                    <a href="{{ url_for('my_account') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                        <i class="fas fa-id-card-alt mr-2"></i>My Account
+                                    </a>
+                                    <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %} {# Else for if session.user_id #}
+                            <a href="{{ url_for('login') }}" class="nav-link bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                <i class="fas fa-sign-in-alt mr-1"></i>Login
+                            </a>
+                             <a href="{{ url_for('register') }}" class="nav-link bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                                <i class="fas fa-user-plus mr-1"></i>Register
+                            </a>
+                        {% endif %} {# End if session.user_id #}
+                        {# --- END CONDITIONAL USER LINKS (DESKTOP) --- #}
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-500 hover:text-gray-600 focus:outline-none" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{{ url_for('index') }}" class="mobile-nav-link">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a href="{{ url_for('gallery') }}" class="mobile-nav-link">
+                    <i class="fas fa-images mr-2"></i>Gallery
+                </a>
+                <a href="{{ url_for('artists') }}" class="mobile-nav-link">
+                    <i class="fas fa-user-tie mr-2"></i>Artists
+                </a>
+                <a href="{{ url_for('events') }}" class="mobile-nav-link">
+                    <i class="fas fa-calendar mr-2"></i>Events
+                </a>
+                <a href="{{ url_for('about') }}" class="mobile-nav-link">
+                    <i class="fas fa-info-circle mr-2"></i>About
+                </a>
+
+                {# --- START CONDITIONAL USER LINKS (MOBILE) --- #}
+                {% if session.user_id %}
+                    <a href="{{ url_for('my_account') }}" class="mobile-nav-link">
+                        <i class="fas fa-id-card-alt mr-2"></i>My Account ({{ session.username }})
+                    </a>
+                    {% if session.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link text-red-600">
+                            <i class="fas fa-cog mr-2"></i>Admin Dashboard
+                        </a>
+                    {% elif session.role == 'artist' %}
+                        {% if session.artist_id %}
+                            <a href="{{ url_for('artist_detail', artist_id=session.artist_id) }}" class="mobile-nav-link">
+                                <i class="fas fa-paint-brush mr-2"></i>My Artist Profile
+                            </a>
+                            <a href="{{ url_for('submit_artwork') }}" class="mobile-nav-link">
+                                <i class="fas fa-upload mr-2"></i>Submit Artwork
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('create_artist_profile') }}" class="mobile-nav-link text-orange-600">
+                                <i class="fas fa-id-card mr-2"></i>Create Artist Profile
+                            </a>
+                        {% endif %} {# End if session.artist_id #}
+                    {% endif %} {# End if session.role == 'admin' / elif session.role == 'artist' #}
+                    <a href="{{ url_for('logout') }}" class="mobile-nav-link">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                {% else %} {# Else for if session.user_id #}
+                    <a href="{{ url_for('login') }}" class="mobile-nav-link">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="mobile-nav-link">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </a>
+                {% endif %} {# End if session.user_id #}
+                {# --- END CONDITIONAL USER LINKS (MOBILE) --- #}
+            </div>
+        </div>
+    </nav>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }} bg-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-100 border border-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-400 text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-700 px-4 py-3 rounded relative mb-4 flex items-center justify-between">
+                        <span class="block sm:inline">{{ message }}</span>
+                        <button type="button" class="text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-700 hover:text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'blue' }}-900 ml-4" onclick="this.parentElement.style.display='none';">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-palette mr-2"></i>Work of Art Gallery
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        Discover and explore extraordinary artworks from talented artists around the world.
+                        Our digital gallery showcases the finest pieces of contemporary and classical art.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url_for('gallery') }}" class="text-gray-300 hover:text-white transition-colors">Gallery</a></li>
+                        <li><a href="{{ url_for('artists') }}" class="text-gray-300 hover:text-white transition-colors">Artists</a></li>
+                        <li><a href="{{ url_for('events') }}" class="text-gray-300 hover:text-white transition-colors">Events</a></li>
+                        <li><a href="{{ url_for('about') }}" class="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>123 Art Street, Gallery District</li>
+                        <li><i class="fas fa-phone mr-2"></i>+1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope mr-2"></i>info@workofart.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center text-gray-300">
+                <p>&copy; 2025 Work of Art Gallery. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Helper function for nav-link styling
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('font-semibold', 'text-blue-600');
+                link.classList.remove('text-gray-700');
+            }
+        });
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('font-semibold', 'text-blue-600');
+                link.classList.remove('text-gray-700');
+            }
+        });
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('user-menu-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenuButton = document.getElementById('user-menu');
+            const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+            if (userMenuButton && userMenuDropdown && !userMenuButton.contains(event.target) && !userMenuDropdown.contains(event.target)) {
+                userMenuDropdown.classList.add('hidden');
+            }
+        });
+
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                if (message && !message.classList.contains('hidden')) { // Ensure it's not already hidden
+                    message.style.transition = 'opacity 0.3s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }, 5000);
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!-- templates/admin_dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Work of Art Gallery{% endblock %}
+
+{% block content %}
+<section class="py-8 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+            <p class="text-gray-600">Manage your gallery content and settings</p>
+        </div>
+
+        {# Flash messages display (This block is already in base.html now, so you might remove it from here if you prefer global handling) #}
+        {# I'll keep it here for redundancy in case base.html changes, but generally, one place is enough #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-md
+                            {% if category == 'success' %} bg-green-100 text-green-700
+                            {% elif category == 'error' %} bg-red-100 text-red-700
+                            {% elif category == 'info' %} bg-blue-100 text-blue-700
+                            {% else %} bg-gray-100 text-gray-700
+                            {% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-images text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">{{ stats.artworks or 0 }}</p>
+                        <p class="text-gray-600">Artworks</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-user-tie text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">{{ stats.artists or 0 }}</p>
+                        <p class="text-gray-600">Artists</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-calendar text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">{{ stats.events or 0 }}</p>
+                        <p class="text-gray-600">Events</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-2xl font-bold text-gray-800">{{ stats.users or 0 }}</p>
+                        <p class="text-gray-600">Users</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Manage Artworks</h3>
+                <p class="text-gray-600 mb-4">Add, edit, or remove artworks from the gallery.</p>
+                <div class="space-y-2">
+                    <a href="{{ url_for('add_artwork') }}" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i>Add Artwork
+                    </a>
+                    <a href="{{ url_for('manage_artworks') }}" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-list mr-2"></i>View All
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Manage Artists</h3>
+                <p class="text-gray-600 mb-4">Add artist profiles and manage their information.</p>
+                <div class="space-y-2">
+                    <a href="{{ url_for('add_artist') }}" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i>Add Artist
+                    </a>
+                    <a href="{{ url_for('manage_artists') }}" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-list mr-2"></i>View All
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Manage Events</h3>
+                <p class="text-gray-600 mb-4">Create and update gallery events.</p>
+                <div class="space-y-2">
+                    <a href="{{ url_for('add_event') }}" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-calendar-plus mr-2"></i>Add Event
+                    </a>
+                    <a href="{{ url_for('manage_events') }}" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-list mr-2"></i>View All
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Manage Users</h3>
+                <p class="text-gray-600 mb-4">View and manage user accounts and roles.</p>
+                <div class="space-y-2">
+                    <a href="{{ url_for('add_user') }}" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-2"></i>Add User
+                    </a>
+                    <a href="{{ url_for('manage_users') }}" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center">
+                        <i class="fas fa-users-cog mr-2"></i>View All
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

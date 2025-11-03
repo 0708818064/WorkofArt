@@ -1,0 +1,122 @@
+{# templates/artwork_detail.html #}
+{% extends "base.html" %}
+
+{% block title %}{{ artwork.title }} by {{ artwork.artist_name or 'Unknown' }} - Work of Art Gallery{% endblock %}
+
+{% block content %}
+<section class="py-8 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden md:flex">
+            <div class="md:w-1/2">
+                {% if artwork.image_url %}
+                    <img class="w-full h-96 object-cover md:h-full md:object-contain" src="{{ artwork.image_url }}" alt="{{ artwork.title }}">
+                {% else %}
+                    <div class="w-full h-96 md:h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                        <i class="fas fa-image fa-6x"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="md:w-1/2 p-6 md:p-10 flex flex-col justify-between">
+                <div>
+                    <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ artwork.title }}</h1>
+                    <p class="text-xl text-gray-700 mb-6">
+                        By <a href="{{ url_for('artist_detail', artist_id=artwork.artist_id) }}" class="text-blue-600 hover:underline">
+                            {{ artwork.artist_name or 'Unknown Artist' }}
+                        </a>
+                        {% if artwork.year_created %}, {{ artwork.year_created }}{% endif %}
+                    </p>
+
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Description:</h3>
+                    <p class="text-gray-700 leading-relaxed mb-6">{{ artwork.description or 'No description provided.' }}</p>
+
+                    <div class="grid grid-cols-2 gap-4 text-gray-700 mb-6">
+                        <div>
+                            <p class="font-medium">Medium:</p>
+                            <p>{{ artwork.medium or 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="font-medium">Dimensions:</p>
+                            <p>{{ artwork.dimensions or 'N/A' }}</p>
+                        </div>
+                    </div>
+
+                    {% if artwork.price is not none %}
+                        <p class="text-2xl font-bold text-gray-900 mb-4">Price:
+                            {% if artwork.price > 0 %}
+                                <span class="text-green-600">${{ "%.2f"|format(artwork.price) }}</span>
+                            {% else %}
+                                <span class="text-blue-600">Free</span>
+                            {% endif %}
+                        </p>
+                    {% else %}
+                        <p class="text-xl font-bold text-gray-900 mb-4">Price: <span class="text-gray-500">Not Available</span></p>
+                    {% endif %}
+                </div>
+
+                {# Buy Now Button Logic #}
+                <div class="mt-8">
+                    {% if artwork.price is not none and artwork.price > 0 %} {# Artwork is priced and available #}
+                        {% if session.user_id %} {# User is logged in #}
+                            {% if session.get('role') == 'artist' and session.get('artist_id') == artwork.artist_id %}
+                                <p class="text-lg text-red-600 font-medium">You cannot purchase your own artwork.</p>
+                            {% else %}
+                                <form action="{{ url_for('buy_artwork', artwork_id=artwork.id) }}" method="POST" class="inline-block">
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md flex items-center justify-center transition-colors">
+                                        <i class="fas fa-shopping-cart mr-2"></i> Buy Now for ${{ "%.2f"|format(artwork.price) }}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %} {# User is not logged in #}
+                            <p class="text-lg text-gray-600">
+                                <a href="{{ url_for('login') }}" class="text-blue-600 hover:underline font-medium">Log in</a> to purchase this artwork.
+                            </p>
+                        {% endif %}
+                    {% else %} {# Artwork is not priced or free #}
+                        {% if artwork.price == 0 %}
+                            <p class="text-lg text-gray-600 mt-4">This artwork is free.</p>
+                        {% else %}
+                            <p class="text-lg text-gray-600 mt-4">This artwork is not currently available for purchase.</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if related_works %}
+        <div class="mt-16">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">More from {{ artwork.artist_name or 'this Artist' }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {% for related_artwork in related_works %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-200 hover:scale-105">
+                    <a href="{{ url_for('artwork_detail', artwork_id=related_artwork.id) }}">
+                        {% if related_artwork.image_url %}
+                            <img class="w-full h-48 object-cover" src="{{ related_artwork.image_url }}" alt="{{ related_artwork.title }}">
+                        {% else %}
+                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-image fa-3x"></i>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 truncate">
+                            <a href="{{ url_for('artwork_detail', artwork_id=related_artwork.id) }}" class="hover:text-blue-600">
+                                {{ related_artwork.title }}
+                            </a>
+                        </h3>
+                        <p class="text-gray-600 text-sm">{% if related_artwork.year_created %}{{ related_artwork.year_created }}{% endif %}</p>
+                        {% if related_artwork.price is not none and related_artwork.price > 0 %}
+                            <p class="text-md font-bold text-green-600 mt-2">${{ "%.2f"|format(related_artwork.price) }}</p>
+                        {% elif related_artwork.price == 0 %}
+                             <p class="text-md font-bold text-blue-600 mt-2">Free</p>
+                        {% else %}
+                            <p class="text-md text-gray-500 mt-2">N/A</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

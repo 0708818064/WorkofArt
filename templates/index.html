@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Work of Art Gallery{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 text-white py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-30"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+            Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">Work of Art</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+            Discover extraordinary artworks from talented artists around the world. 
+            Experience the beauty, creativity, and passion that defines contemporary art.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('gallery') }}" class="btn-primary bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-images mr-2"></i>Explore Gallery
+            </a>
+            <a href="{{ url_for('events') }}" class="btn-secondary border-2 border-white text-white hover:bg-white hover:text-gray-800 font-bold py-4 px-8 rounded-full transition-all duration-300">
+                <i class="fas fa-calendar mr-2"></i>View Events
+            </a>
+        </div>
+    </div>
+    
+    <!-- Floating Art Elements -->
+    <div class="absolute top-10 left-10 opacity-20 animate-float">
+        <i class="fas fa-palette text-6xl text-yellow-400"></i>
+    </div>
+    <div class="absolute bottom-10 right-10 opacity-20 animate-float-delayed">
+        <i class="fas fa-paint-brush text-5xl text-pink-400"></i>
+    </div>
+</section>
+
+<!-- Featured Artworks Section -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Featured Artworks</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Discover our carefully curated selection of outstanding pieces that showcase the diversity and beauty of contemporary art.
+            </p>
+        </div>
+        
+        {% if featured_artworks %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for artwork in featured_artworks %}
+            <div class="artwork-card bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <div class="relative overflow-hidden group">
+                    <img src="{{ artwork.image_url or '/static/images/placeholder-artwork.jpg' }}" 
+                         alt="{{ artwork.title }}" 
+                         class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                        <a href="{{ url_for('artwork_detail', artwork_id=artwork.id) }}" 
+                           class="opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-6 py-2 rounded-full font-semibold transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ artwork.title }}</h3>
+                    <p class="text-gray-600 mb-2">
+                        <i class="fas fa-user mr-1"></i>
+                        {% if artwork.artist_name %}
+                            <a href="{{ url_for('artist_detail', artist_id=artwork.artist_id) }}" class="hover:text-blue-600 transition-colors">
+                                {{ artwork.artist_name }}
+                            </a>
+                        {% else %}
+                            Unknown Artist
+                        {% endif %}
+                    </p>
+                    {% if artwork.year_created %}
+                    <p class="text-gray-500 mb-3">
+                        <i class="fas fa-calendar mr-1"></i>{{ artwork.year_created }}
+                    </p>
+                    {% endif %}
+                    {% if artwork.description %}
+                    <p class="text-gray-700 text-sm line-clamp-3">
+                        {{ artwork.description[:100] }}{% if artwork.description|length > 100 %}...{% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{{ url_for('gallery') }}" class="inline-flex items-center btn-primary bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-images mr-2"></i>View All Artworks
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-images text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-500">No featured artworks available at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Upcoming Events Section -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Upcoming Events</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Don't miss our exciting exhibitions, workshops, and art events. Join us for unforgettable experiences.
+            </p>
+        </div>
+        
+        {% if upcoming_events %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for event in upcoming_events %}
+            <div class="event-card bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <div class="relative">
+                    <img src="{{ event.image_url or '/static/images/placeholder-event.jpg' }}" 
+                         alt="{{ event.title }}" 
+                         class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        {{ event.event_date.strftime('%b %d') if event.event_date else 'TBA' }}
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ event.title }}</h3>
+                    {% if event.description %}
+                    <p class="text-gray-600 mb-4 line-clamp-3">
+                        {{ event.description[:150] }}{% if event.description|length > 150 %}...{% endif %}
+                    </p>
+                    {% endif %}
+                    <div class="space-y-2 text-sm text-gray-600">
+                        {% if event.event_date %}
+                        <p><i class="fas fa-calendar mr-2"></i>{{ event.event_date.strftime('%B %d, %Y') }}</p>
+                        {% endif %}
+                        {% if event.location %}
+                        <p><i class="fas fa-map-marker-alt mr-2"></i>{{ event.location }}</p>
+                        {% endif %}
+                        {% if event.ticket_price %}
+                        <p><i class="fas fa-ticket-alt mr-2"></i>${{ event.ticket_price }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="mt-6">
+                        <a href="{{ url_for('events') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                            Learn More <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{{ url_for('events') }}" class="inline-flex items-center btn-primary bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-calendar mr-2"></i>View All Events
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-calendar text-6xl text-gray-300 mb-4"></i>
+            <p class="text-xl text-gray-500">No upcoming events scheduled at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-16 bg-gradient-to-r from-blue-600 to-purple-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div class="stat-item">
+                <div class="text-4xl font-bold mb-2 counter" data-target="150">0</div>
+                <div class="text-lg opacity-90">Artworks</div>
+            </div>
+            <div class="stat-item">
+                <div class="text-4xl font-bold mb-2 counter" data-target="45">0</div>
+                <div class="text-lg opacity-90">Artists</div>
+            </div>
+            <div class="stat-item">
+                <div class="text-4xl font-bold mb-2 counter" data-target="25">0</div>
+                <div class="text-lg opacity-90">Exhibitions</div>
+            </div>
+            <div class="stat-item">
+                <div class="text-4xl font-bold mb-2 counter" data-target="1200">0</div>
+                <div class="text-lg opacity-90">Visitors</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-16 bg-gray-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Stay Connected</h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto text-gray-300">
+            Subscribe to our newsletter and be the first to know about new artworks, exhibitions, and exclusive events.
+        </p>
+        <form class="max-w-md mx-auto flex gap-4">
+            <input type="email" placeholder="Enter your email address" 
+                   class="flex-1 px-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Counter animation
+function animateCounters() {
+    const counters = document.querySelectorAll('.counter');
+    const options = {
+        threshold: 0.7
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = parseInt(counter.dataset.target);
+                let count = 0;
+                const increment = target / 100;
+
+                const timer = setInterval(() => {
+                    count += increment;
+                    counter.textContent = Math.floor(count);
+                    
+                    if (count >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    }
+                }, 20);
+
+                observer.unobserve(counter);
+            }
+        });
+    }, options);
+
+    counters.forEach(counter => observer.observe(counter));
+}
+
+// Initialize animations when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    animateCounters();
+});
+</script>
+{% endblock %}

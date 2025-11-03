@@ -1,0 +1,71 @@
+<!-- templates/artists.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Artists - Work of Art Gallery{% endblock %}
+
+{% block content %}
+<section class="bg-gradient-to-r from-purple-900 to-blue-900 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Featured Artists</h1>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+            Discover the talented artists whose works grace our gallery.
+        </p>
+    </div>
+</section>
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if artists %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for artist in artists %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <div class="relative">
+                    <div class="h-64 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
+                        {% if artist.image_url %}
+                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                        {% else %}
+                            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                <i class="fas fa-user text-4xl text-gray-400"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="p-6 text-center">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">{{ artist.name }}</h3>
+                    {% if artist.nationality %}
+                    <p class="text-gray-600 mb-2">{{ artist.nationality }}</p>
+                    {% endif %}
+                    {% if artist.birth_year or artist.death_year %}
+                    <p class="text-sm text-gray-500 mb-4">
+                        {% if artist.birth_year %}{{ artist.birth_year }}{% endif %}
+                        {% if artist.death_year %} - {{ artist.death_year }}{% endif %}
+                    </p>
+                    {% endif %}
+                    {% if artist.biography %}
+                    <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+                        {{ artist.biography[:150] }}{% if artist.biography|length > 150 %}...{% endif %}
+                    </p>
+                    {% endif %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">
+                            <i class="fas fa-images mr-1"></i>{{ artist.artwork_count or 0 }} works
+                        </span>
+                        <a href="{{ url_for('artist_detail', artist_id=artist.id) }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <i class="fas fa-user-tie text-8xl text-gray-300 mb-6"></i>
+            <h3 class="text-2xl font-bold text-gray-600 mb-4">No Artists Found</h3>
+            <p class="text-lg text-gray-500">Artists will appear here once they are added to the gallery.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

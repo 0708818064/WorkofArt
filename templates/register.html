@@ -1,0 +1,61 @@
+{# templates/register.html #}
+{% extends "base.html" %}
+
+{% block title %}Register - Work of Art Gallery{% endblock %}
+
+{% block content %}
+<section class="py-8 bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Your Account</h2>
+
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" name="username" required value="{{ username if username else '' }}"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="email" name="email" required value="{{ email if email else '' }}"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password" name="password" required
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <p class="mt-1 text-xs text-gray-500">Minimum 6 characters.</p>
+                </div>
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+
+                <div class="relative flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="register_as_artist" name="register_as_artist" type="checkbox"
+                               {% if register_as_artist %}checked{% endif %}
+                               class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="register_as_artist" class="font-medium text-gray-700">Register as an Artist</label>
+                        <p class="text-gray-500">Enable features to showcase your art in the gallery.</p>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Register
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">Already have an account?
+                    <a href="{{ url_for('login') }}" class="font-medium text-blue-600 hover:text-blue-500">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

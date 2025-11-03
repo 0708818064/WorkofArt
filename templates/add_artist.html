@@ -1,0 +1,61 @@
+{# templates/add_artist.html #}
+{% extends "base.html" %}
+
+{% block title %}Add New Artist - Admin{% endblock %}
+
+{% block content %}
+<section class="py-8 bg-gray-50 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Artist</h1>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Artist Name</label>
+                    <input type="text" id="name" name="name" required
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="biography" class="block text-sm font-medium text-gray-700 mb-1">Biography</label>
+                    <textarea id="biography" name="biography" rows="5"
+                              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="birth_year" class="block text-sm font-medium text-gray-700 mb-1">Birth Year</label>
+                        <input type="number" id="birth_year" name="birth_year"
+                               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="death_year" class="block text-sm font-medium text-gray-700 mb-1">Death Year (Optional)</label>
+                        <input type="number" id="death_year" name="death_year"
+                               class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="nationality" class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                    <input type="text" id="nationality" name="nationality"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="image" class="block text-sm font-medium text-gray-700 mb-1">Artist Image</label>
+                    <input type="file" id="image" name="image" accept="image/*"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                    <p class="mt-1 text-sm text-gray-500">Allowed formats: png, jpg, jpeg, gif, webp. Max size: 16MB.</p>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('admin_dashboard') }}"
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Add Artist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
